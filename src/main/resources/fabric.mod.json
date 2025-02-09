@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "lightsword",
+	"version": "${version}",
+	"name": "LightSword",
+	"description": "这是一个光剑mod，可以发射光束，破坏方块，击杀生物，还可以照亮周围的区域。功能十分强大，但是也需要一定的能量，在信标旁可以恢复能量。",
+	"authors": [
+		"赵隽博"
+	],
+	"contact": {
+		"homepage": "https://github.com/changshanzhao/lightsword",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/lightsword/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.junbo.lightsword.LightSword"
+		],
+		"client": [
+			"com.junbo.lightsword.LightSwordClient"
+		],
+		"fabric-datagen": [
+			"com.junbo.lightsword.LightSwordDataGenerator"
+		]
+	},
+	"mixins": [
+		"lightsword.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.10",
+		"minecraft": "~1.21.4",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

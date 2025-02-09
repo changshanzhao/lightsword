@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "com.junbo.lightsword.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"LightSwordMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
