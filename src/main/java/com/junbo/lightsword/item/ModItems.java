@@ -1,50 +1,49 @@
 package com.junbo.lightsword.item;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
+
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.UnbreakableComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.item.*;
+
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
-import java.util.List;
-import java.util.function.Function;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
+import java.lang.reflect.Constructor;
 
 
 public class ModItems {
     private ModItems() {
     }
 
-    public static final Item LightSword = register("light_sword", Item::new, new Item.Settings().component(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(true)));
-
-    public static void registerToVanillaItemGroups() {
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
-            content.addAfter(Items.DIAMOND_SWORD, LightSword);
-        });
+    @SafeVarargs
+    private static Item registerToolItem(Class toolClass, ToolMaterial material, float attackDamage, float attackSpeed, Item.Settings settings, RegistryKey<ItemGroup>... itemGroups) {
+        Identifier identifier = settings.getModelId();
+        Item customItem;
+        try {
+            Constructor constructor = Objects.requireNonNull(toolClass).getConstructor(ToolMaterial.class,float.class,float.class,Item.Settings.class);
+            customItem = (Item) constructor.newInstance(material, attackDamage, attackSpeed, settings);
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        Item registeredItem = Registry.register(Registries.ITEM, identifier, customItem);
+        for (RegistryKey<ItemGroup> itemGroup : itemGroups) {
+            ItemGroupEvents.modifyEntriesEvent(itemGroup).register(fabricItemGroupEntries -> fabricItemGroupEntries.add(registeredItem));
+        }
+        return registeredItem;
     }
-
-    public static Item register(String path, Function<Item.Settings, Item> factory, Item.Settings settings) {
-        final RegistryKey<Item> registryKey = RegistryKey.of(RegistryKeys.ITEM, Identifier.of("tutorial", path));
-        return Items.register(registryKey, factory, settings);
+    public static Item.Settings createDefaultItemSettings(String id) {
+        Identifier identifier = Identifier.of("lightsword", id);
+        return new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM,identifier));
     }
+    public static final Item LIGHT_SWORD = registerToolItem(SwordItem.class, ModMaterials.ModToolMaterials.HEAVEN_TOOL_MATERIAL, 26.0f, -2.0f, createDefaultItemSettings("light_sword"), ItemGroups.COMBAT);
 
 
     public static void initialize() {
-        ModItems.registerToVanillaItemGroups();
+
 
 
     }
